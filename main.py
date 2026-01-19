@@ -7,9 +7,13 @@ from sqlalchemy.orm import sessionmaker, relationship
 from datetime import datetime
 from decimal import Decimal
 from typing import List, Optional
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Database configuration
-import os
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:tayyab@localhost/billu")
 # Render uses postgres:// format, convert to postgresql://
 if DATABASE_URL.startswith("postgres://"):
