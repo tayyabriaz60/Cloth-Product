@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clothing Billing System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="config.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen py-8">
+    <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-8 text-center">Clothing Billing System</h1>
+        
+        <form id="billForm" class="space-y-6">
+            <!-- Kameez Section -->
+            <div class="bg-blue-50 p-6 rounded-lg">
+                <h2 class="text-xl font-semibold text-gray-700 mb-4">Kameez Details</h2>
+                <div class="mb-4">
+                    <label for="kameezInventorySelect" class="block text-sm font-medium text-gray-700 mb-2">
+                        Select Company & Design (Optional)
+                    </label>
+                    <select 
+                        id="kameezInventorySelect" 
+                        name="kameezInventorySelect"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                        <option value="">-- Select Kameez Inventory (Optional) --</option>
+                    </select>
+                    <p class="text-xs text-gray-500 mt-1" id="kameezStockInfo"></p>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="kameezMeters" class="block text-sm font-medium text-gray-700 mb-2">
+                            Meters
+                        </label>
+                        <input 
+                            type="number" 
+                            id="kameezMeters" 
+                            name="kameezMeters"
+                            step="0.01"
+                            min="0"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="0.00"
+                        />
+                    </div>
+                    <div>
+                        <label for="kameezRate" class="block text-sm font-medium text-gray-700 mb-2">
+                            Rate (per meter)
+                        </label>
+                        <input 
+                            type="number" 
+                            id="kameezRate" 
+                            name="kameezRate"
+                            step="0.01"
+                            min="0"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="0.00"
+                        />
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Kameez Total
+                        </label>
+                        <div id="kameezTotal" class="text-2xl font-bold text-blue-600">
+                            Rs. 0.00
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shalwar Section -->
+            <div class="bg-green-50 p-6 rounded-lg">
+                <h2 class="text-xl font-semibold text-gray-700 mb-4">Shalwar Details</h2>
+                <div class="mb-4">
+                    <label for="shalwarInventorySelect" class="block text-sm font-medium text-gray-700 mb-2">
+                        Select Company & Design (Optional)
+                    </label>
+                    <select 
+                        id="shalwarInventorySelect" 
+                        name="shalwarInventorySelect"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    >
+                        <option value="">-- Select Shalwar Inventory (Optional) --</option>
+                    </select>
+                    <p class="text-xs text-gray-500 mt-1" id="shalwarStockInfo"></p>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="shalwarMeters" class="block text-sm font-medium text-gray-700 mb-2">
+                            Meters
+                        </label>
+                        <input 
+                            type="number" 
+                            id="shalwarMeters" 
+                            name="shalwarMeters"
+                            step="0.01"
+                            min="0"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                            placeholder="0.00"
+                        />
+                    </div>
+                    <div>
+                        <label for="shalwarRate" class="block text-sm font-medium text-gray-700 mb-2">
+                            Rate (per meter)
+                        </label>
+                        <input 
+                            type="number" 
+                            id="shalwarRate" 
+                            name="shalwarRate"
+                            step="0.01"
+                            min="0"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                            placeholder="0.00"
+                        />
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Shalwar Total
+                        </label>
+                        <div id="shalwarTotal" class="text-2xl font-bold text-green-600">
+                            Rs. 0.00
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grand Total Section -->
+            <div class="bg-purple-50 p-6 rounded-lg border-2 border-purple-200">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-gray-700">Grand Total</h2>
+                    <div id="grandTotal" class="text-3xl font-bold text-purple-600">
+                        Rs. 0.00
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-4">
+                <button 
+                    type="button" 
+                    id="standardSizeBtn"
+                    class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-md transition duration-200"
+                >
+                    Apply Standard Size (2.5m)
+                </button>
+                <button 
+                    type="submit" 
+                    id="submitBtn"
+                    class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-md transition duration-200"
+                >
+                    Submit Bill
+                </button>
+            </div>
+
+            <!-- Success/Error Message -->
+            <div id="message" class="hidden mt-4 p-4 rounded-md"></div>
+        </form>
+    </div>
+
+    <script>
+        // Get form elements
+        const form = document.getElementById('billForm');
+        const kameezMeters = document.getElementById('kameezMeters');
+        const kameezRate = document.getElementById('kameezRate');
+        const shalwarMeters = document.getElementById('shalwarMeters');
+        const shalwarRate = document.getElementById('shalwarRate');
+        const kameezTotalDisplay = document.getElementById('kameezTotal');
+        const shalwarTotalDisplay = document.getElementById('shalwarTotal');
+        const grandTotalDisplay = document.getElementById('grandTotal');
+        const standardSizeBtn = document.getElementById('standardSizeBtn');
+        const messageDiv = document.getElementById('message');
+        const kameezInventorySelect = document.getElementById('kameezInventorySelect');
+        const shalwarInventorySelect = document.getElementById('shalwarInventorySelect');
+        const kameezStockInfo = document.getElementById('kameezStockInfo');
+        const shalwarStockInfo = document.getElementById('shalwarStockInfo');
+
+        // Function to format currency
+        function formatCurrency(amount) {
+            return 'Rs. ' + parseFloat(amount).toFixed(2);
+        }
+
+        // Function to calculate totals
+        function calculateTotals() {
+            const kameezM = parseFloat(kameezMeters.value) || 0;
+            const kameezR = parseFloat(kameezRate.value) || 0;
+            const shalwarM = parseFloat(shalwarMeters.value) || 0;
+            const shalwarR = parseFloat(shalwarRate.value) || 0;
+
+            const kameezTotal = kameezM * kameezR;
+            const shalwarTotal = shalwarM * shalwarR;
+            const grandTotal = kameezTotal + shalwarTotal;
+
+            kameezTotalDisplay.textContent = formatCurrency(kameezTotal);
+            shalwarTotalDisplay.textContent = formatCurrency(shalwarTotal);
+            grandTotalDisplay.textContent = formatCurrency(grandTotal);
+        }
+
+        // Event listeners for real-time calculation
+        kameezMeters.addEventListener('input', calculateTotals);
+        kameezRate.addEventListener('input', calculateTotals);
+        shalwarMeters.addEventListener('input', calculateTotals);
+        shalwarRate.addEventListener('input', calculateTotals);
+
+        // Standard size button functionality
+        standardSizeBtn.addEventListener('click', () => {
+            kameezMeters.value = 2.5;
+            shalwarMeters.value = 2.5;
+            calculateTotals();
+        });
+
+        // Form submission
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Hide previous messages
+            messageDiv.classList.add('hidden');
+
+            // Get form values
+            const kameezSelectedOption = kameezInventorySelect.options[kameezInventorySelect.selectedIndex];
+            const shalwarSelectedOption = shalwarInventorySelect.options[shalwarInventorySelect.selectedIndex];
+            
+            const billData = {
+                kameez_inventory_id: kameezInventorySelect.value ? parseInt(kameezInventorySelect.value) : null,
+                shalwar_inventory_id: shalwarInventorySelect.value ? parseInt(shalwarInventorySelect.value) : null,
+                kameez_company_name: kameezSelectedOption.value ? kameezSelectedOption.dataset.companyName : null,
+                kameez_design_code: kameezSelectedOption.value ? kameezSelectedOption.dataset.designCode : null,
+                shalwar_company_name: shalwarSelectedOption.value ? shalwarSelectedOption.dataset.companyName : null,
+                shalwar_design_code: shalwarSelectedOption.value ? shalwarSelectedOption.dataset.designCode : null,
+                kameez_meters: parseFloat(kameezMeters.value),
+                kameez_rate: parseFloat(kameezRate.value),
+                shalwar_meters: parseFloat(shalwarMeters.value),
+                shalwar_rate: parseFloat(shalwarRate.value)
+            };
+
+            // Validate inputs
+            if (!billData.kameez_meters || !billData.kameez_rate || 
+                !billData.shalwar_meters || !billData.shalwar_rate) {
+                showMessage('Please fill in all fields', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/create-bill`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(billData)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    showMessage(`Bill created successfully! Bill ID: ${data.id}`, 'success');
+                    // Reset form
+                    form.reset();
+                    calculateTotals();
+                    // Reload inventory to reflect updated stock
+                    loadInventory();
+                } else {
+                    const error = await response.json();
+                    showMessage(`Error: ${error.detail || 'Failed to create bill'}`, 'error');
+                }
+            } catch (error) {
+                showMessage(`Error: ${error.message}`, 'error');
+            }
+        });
+
+        // Load inventory options on page load
+        async function loadInventory() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/get-inventory-simple`);
+                const inventory = await response.json();
+                
+                // Clear and populate Kameez dropdown
+                kameezInventorySelect.innerHTML = '<option value="">-- Select Kameez Inventory (Optional) --</option>';
+                inventory.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item.id;
+                    option.textContent = `${item.company_name} - ${item.design_code} (${item.remaining_meters.toFixed(2)}m available)`;
+                    option.dataset.companyName = item.company_name;
+                    option.dataset.designCode = item.design_code;
+                    option.dataset.remainingMeters = item.remaining_meters;
+                    kameezInventorySelect.appendChild(option);
+                });
+                
+                // Clear and populate Shalwar dropdown
+                shalwarInventorySelect.innerHTML = '<option value="">-- Select Shalwar Inventory (Optional) --</option>';
+                inventory.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item.id;
+                    option.textContent = `${item.company_name} - ${item.design_code} (${item.remaining_meters.toFixed(2)}m available)`;
+                    option.dataset.companyName = item.company_name;
+                    option.dataset.designCode = item.design_code;
+                    option.dataset.remainingMeters = item.remaining_meters;
+                    shalwarInventorySelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading inventory:', error);
+            }
+        }
+
+        // Update stock info when Kameez inventory is selected
+        kameezInventorySelect.addEventListener('change', (e) => {
+            const selectedOption = e.target.options[e.target.selectedIndex];
+            if (selectedOption.value) {
+                const remainingMeters = parseFloat(selectedOption.dataset.remainingMeters);
+                kameezStockInfo.textContent = `Available Stock: ${remainingMeters.toFixed(2)} meters`;
+                kameezStockInfo.className = 'text-xs text-green-600 mt-1 font-medium';
+            } else {
+                kameezStockInfo.textContent = '';
+            }
+        });
+
+        // Update stock info when Shalwar inventory is selected
+        shalwarInventorySelect.addEventListener('change', (e) => {
+            const selectedOption = e.target.options[e.target.selectedIndex];
+            if (selectedOption.value) {
+                const remainingMeters = parseFloat(selectedOption.dataset.remainingMeters);
+                shalwarStockInfo.textContent = `Available Stock: ${remainingMeters.toFixed(2)} meters`;
+                shalwarStockInfo.className = 'text-xs text-green-600 mt-1 font-medium';
+            } else {
+                shalwarStockInfo.textContent = '';
+            }
+        });
+
+        // Load inventory on page load
+        loadInventory();
+
+        // Function to show messages
+        function showMessage(message, type) {
+            messageDiv.textContent = message;
+            messageDiv.className = `mt-4 p-4 rounded-md ${
+                type === 'success' 
+                    ? 'bg-green-100 text-green-800 border border-green-400' 
+                    : 'bg-red-100 text-red-800 border border-red-400'
+            }`;
+            messageDiv.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
