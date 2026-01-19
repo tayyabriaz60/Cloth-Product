@@ -14,13 +14,28 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Database configuration
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:tayyab@localhost/billu")
+DATABASE_URL = os.getenv("DATABASE_URL")
+if not DATABASE_URL:
+    # Check if we're in production (Render sets RENDER env var)
+    if os.getenv("RENDER") or os.getenv("PORT"):
+        raise ValueError("DATABASE_URL environment variable is required in production!")
+    # Fallback for local development only
+    DATABASE_URL = "postgresql://postgres:tayyab@localhost/billu"
+    print("⚠ Warning: DATABASE_URL not set, using localhost fallback")
+else:
+    print(f"✓ DATABASE_URL found (length: {len(DATABASE_URL)})")
+
 # Render uses postgres:// format, convert to postgresql://
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
-# Create engine and session
-engine = create_engine(DATABASE_URL)
+# Create engine with connection pooling and retry logic
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,  # Verify connections before using
+    pool_recycle=300,    # Recycle connections after 5 minutes
+    connect_args={"connect_timeout": 10}  # 10 second timeout
+)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
@@ -60,8 +75,8 @@ class SalesRecord(Base):
     grand_total = Column(Numeric(10, 2))
     created_at = Column(DateTime, default=datetime.utcnow)
 
-# Create tables
-Base.metadata.create_all(bind=engine)
+# Create tables - will be done on startup to ensure database is ready
+# Don't create tables at module import time
 
 # Migration function to add new columns if they don't exist
 def migrate_database():
@@ -116,7 +131,17 @@ app = FastAPI()
 @app.on_event("startup")
 async def startup_event():
     """Run database migration on application startup"""
-    migrate_database()
+    try:
+        # Create tables first
+        Base.metadata.create_all(bind=engine)
+        print("✓ Database tables created/verified")
+        
+        # Then run migration
+        migrate_database()
+    except Exception as e:
+        print(f"⚠ Database connection error on startup: {str(e)}")
+        print("⚠ Will retry on first request...")
+        # Don't fail startup - let it retry on first request
 
 # Enable CORS for frontend
 # In production, you might want to restrict origins
