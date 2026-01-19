@@ -268,8 +268,24 @@
         // Load inventory options on page load
         async function loadInventory() {
             try {
-                const response = await fetch(`${API_BASE_URL}/get-inventory-simple`);
+                // Fallback if API_BASE_URL is not defined
+                const apiUrl = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://localhost:8000';
+                const response = await fetch(`${apiUrl}/get-inventory-simple`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const inventory = await response.json();
+                
+                // Check if inventory is empty
+                if (!inventory || inventory.length === 0) {
+                    // Show message that no stock is available
+                    kameezInventorySelect.innerHTML = '<option value="">-- No Stock Available --</option>';
+                    shalwarInventorySelect.innerHTML = '<option value="">-- No Stock Available --</option>';
+                    console.log('No inventory items found');
+                    return;
+                }
                 
                 // Clear and populate Kameez dropdown
                 kameezInventorySelect.innerHTML = '<option value="">-- Select Kameez Inventory (Optional) --</option>';
@@ -294,8 +310,13 @@
                     option.dataset.remainingMeters = item.remaining_meters;
                     shalwarInventorySelect.appendChild(option);
                 });
+                
+                console.log(`✓ Loaded ${inventory.length} inventory items`);
             } catch (error) {
                 console.error('Error loading inventory:', error);
+                kameezInventorySelect.innerHTML = '<option value="">-- Error Loading Stock --</option>';
+                shalwarInventorySelect.innerHTML = '<option value="">-- Error Loading Stock --</option>';
+                showMessage('Error loading inventory. Please refresh the page.', 'error');
             }
         }
 
