@@ -132,17 +132,48 @@ app.add_middleware(
 # Serve static files (HTML, CSS, JS)
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+import os
+
+# Get current directory - use __file__ location
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+def get_file_path(filename):
+    """Get absolute path for a file in the project directory"""
+    file_path = os.path.join(BASE_DIR, filename)
+    # Also try current working directory as fallback
+    if not os.path.exists(file_path):
+        cwd_path = os.path.join(os.getcwd(), filename)
+        if os.path.exists(cwd_path):
+            return cwd_path
+    return file_path
 
 @app.get("/")
 async def read_root():
-    return FileResponse("index.html")
+    file_path = get_file_path("index.html")
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="index.html not found")
+    return FileResponse(file_path)
+
+@app.get("/index.html")
+async def index_html():
+    file_path = get_file_path("index.html")
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="index.html not found")
+    return FileResponse(file_path)
 
 @app.get("/admin")
 async def admin_page():
-    return FileResponse("admin.html")
+    file_path = get_file_path("admin.html")
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="admin.html not found")
+    return FileResponse(file_path)
 
-# Serve static files
-app.mount("/static", StaticFiles(directory="."), name="static")
+@app.get("/config.js")
+async def config_js():
+    file_path = get_file_path("config.js")
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="config.js not found")
+    return FileResponse(file_path, media_type="application/javascript")
 
 # Pydantic models for request/response
 class StockCreate(BaseModel):
