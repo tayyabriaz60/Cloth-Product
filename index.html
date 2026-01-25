@@ -8,10 +8,102 @@
     <script src="config.js"></script>
 </head>
 <body class="bg-gray-100 min-h-screen py-8">
-    <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-8">
-        <h1 class="text-3xl font-bold text-gray-800 mb-8 text-center">Clothing Billing System</h1>
-        
-        <form id="billForm" class="space-y-6">
+    <div class="max-w-7xl mx-auto px-4">
+        <!-- Header -->
+        <div class="mb-8 text-center">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Clothing Sales System</h1>
+            <p class="text-gray-600">Select Product Category to Create Bill</p>
+            <a href="admin.html" class="mt-4 inline-block text-blue-600 hover:text-blue-800">→ Go to Admin Dashboard</a>
+        </div>
+
+        <!-- Product Category Selection -->
+        <div id="categorySelectionSection" class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <div class="text-center mb-6">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Select Product Category</h2>
+                <p class="text-lg text-gray-600 mb-2">Choose a category to create a sales bill</p>
+                <p class="text-sm text-gray-500">Click any button below to start billing for that category</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- 2 Piece Suits Button -->
+                <a 
+                    href="/sales/two_piece_suits"
+                    class="product-category-btn bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-10 px-6 rounded-xl shadow-lg transition-all duration-200 transform hover:scale-105 active:scale-95 border-2 border-blue-500 text-center block"
+                >
+                    <div class="text-4xl mb-3">👔</div>
+                    <div class="text-xl font-semibold">2 Piece Suits</div>
+                    <div class="text-sm mt-2 opacity-90">Kameez & Shalwar</div>
+                    <div class="text-xs mt-2 opacity-75 border-t border-blue-400 pt-2">Click to Create Bill</div>
+                </a>
+
+                <!-- 3 Piece Suits Button -->
+                <a 
+                    href="/sales/three_piece_suits"
+                    class="product-category-btn bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold py-10 px-6 rounded-xl shadow-lg transition-all duration-200 transform hover:scale-105 active:scale-95 border-2 border-purple-500 text-center block"
+                >
+                    <div class="text-4xl mb-3">👗</div>
+                    <div class="text-xl font-semibold">3 Piece Suits</div>
+                    <div class="text-sm mt-2 opacity-90">Kameez, Shalwar & Waistcoat</div>
+                    <div class="text-xs mt-2 opacity-75 border-t border-purple-400 pt-2">Click to Create Bill</div>
+                </a>
+
+                <!-- Gents Button -->
+                <a 
+                    href="/sales/gents"
+                    class="product-category-btn bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-10 px-6 rounded-xl shadow-lg transition-all duration-200 transform hover:scale-105 active:scale-95 border-2 border-green-500 text-center block"
+                >
+                    <div class="text-4xl mb-3">🧥</div>
+                    <div class="text-xl font-semibold">Gents</div>
+                    <div class="text-sm mt-2 opacity-90">Men's Clothing</div>
+                    <div class="text-xs mt-2 opacity-75 border-t border-green-400 pt-2">Click to Create Bill</div>
+                </a>
+
+                <!-- Ladies Button -->
+                <a 
+                    href="/sales/ladies"
+                    class="product-category-btn bg-gradient-to-r from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 text-white font-bold py-10 px-6 rounded-xl shadow-lg transition-all duration-200 transform hover:scale-105 active:scale-95 border-2 border-pink-500 text-center block"
+                >
+                    <div class="text-4xl mb-3">👚</div>
+                    <div class="text-xl font-semibold">Ladies</div>
+                    <div class="text-sm mt-2 opacity-90">Women's Clothing</div>
+                    <div class="text-xs mt-2 opacity-75 border-t border-pink-400 pt-2">Click to Create Bill</div>
+                </a>
+
+                <!-- Kids Button -->
+                <a 
+                    href="/sales/kids"
+                    class="product-category-btn bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white font-bold py-10 px-6 rounded-xl shadow-lg transition-all duration-200 transform hover:scale-105 active:scale-95 border-2 border-yellow-400 text-center block"
+                >
+                    <div class="text-4xl mb-3">👶</div>
+                    <div class="text-xl font-semibold">Kids</div>
+                    <div class="text-sm mt-2 opacity-90">Children's Clothing</div>
+                    <div class="text-xs mt-2 opacity-75 border-t border-yellow-300 pt-2">Click to Create Bill</div>
+                </a>
+
+                <!-- Accessories Button -->
+                <a 
+                    href="/sales/accessories"
+                    class="product-category-btn bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold py-10 px-6 rounded-xl shadow-lg transition-all duration-200 transform hover:scale-105 active:scale-95 border-2 border-indigo-500 text-center block"
+                >
+                    <div class="text-4xl mb-3">👜</div>
+                    <div class="text-xl font-semibold">Accessories</div>
+                    <div class="text-sm mt-2 opacity-90">Bags, Shoes & More</div>
+                    <div class="text-xs mt-2 opacity-75 border-t border-indigo-400 pt-2">Click to Create Bill</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Sales Form Section (Shown when category is selected via URL) -->
+        <div id="salesFormSection" class="hidden">
+            <div class="mb-6 flex items-center justify-between">
+                <div>
+                    <h2 id="categoryTitle" class="text-3xl font-bold text-gray-800"></h2>
+                    <p class="text-sm text-gray-600 mt-1">Billing for: <strong id="categoryNameInBilling" class="text-blue-700"></strong></p>
+                </div>
+                <a href="/" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-md">
+                    ← Back to Categories
+                </a>
+            </div>
+            <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-8 border-l-4 border-blue-500">
             <!-- Kameez Section -->
             <div class="bg-blue-50 p-6 rounded-lg">
                 <h2 class="text-xl font-semibold text-gray-700 mb-4">Kameez Details</h2>
@@ -158,6 +250,72 @@
     </div>
 
     <script>
+        // Category names mapping
+        const categoryNames = {
+            'two_piece_suits': '2 Piece Suits',
+            'three_piece_suits': '3 Piece Suits',
+            'gents': 'Gents',
+            'ladies': 'Ladies',
+            'kids': 'Kids',
+            'accessories': 'Accessories'
+        };
+
+        // Category colors mapping
+        const categoryColors = {
+            'two_piece_suits': 'blue-600',
+            'three_piece_suits': 'purple-600',
+            'gents': 'green-600',
+            'ladies': 'pink-600',
+            'kids': 'yellow-600',
+            'accessories': 'indigo-600'
+        };
+
+        // Get current category from URL
+        function getCategoryFromURL() {
+            const path = window.location.pathname;
+            const match = path.match(/\/sales\/([^\/]+)/);
+            return match ? match[1] : null;
+        }
+
+        // Current product category
+        let currentSalesCategory = getCategoryFromURL() || 'two_piece_suits';
+
+        // Initialize page based on URL
+        function initializeSalesPage() {
+            const category = getCategoryFromURL();
+            
+            if (category && categoryNames[category]) {
+                // Show sales form section
+                document.getElementById('categorySelectionSection').classList.add('hidden');
+                document.getElementById('salesFormSection').classList.remove('hidden');
+                
+                // Set category title
+                const color = categoryColors[category];
+                const displayName = categoryNames[category];
+                document.getElementById('categoryTitle').textContent = `${displayName} - Create Bill`;
+                document.getElementById('categoryTitle').className = `text-3xl font-bold text-${color}`;
+                
+                // Update category name in billing form
+                const categoryNameInBilling = document.getElementById('categoryNameInBilling');
+                if (categoryNameInBilling) {
+                    categoryNameInBilling.textContent = displayName;
+                }
+                
+                // Set current category
+                currentSalesCategory = category;
+                
+                // Load inventory for this category
+                loadInventory();
+            } else {
+                // Show category selection
+                document.getElementById('categorySelectionSection').classList.remove('hidden');
+                document.getElementById('salesFormSection').classList.add('hidden');
+            }
+        }
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', initializeSalesPage);
+
         // Get form elements
         const form = document.getElementById('billForm');
         const kameezMeters = document.getElementById('kameezMeters');
@@ -220,6 +378,7 @@
             const shalwarSelectedOption = shalwarInventorySelect.options[shalwarInventorySelect.selectedIndex];
             
             const billData = {
+                product_category: currentSalesCategory,
                 kameez_inventory_id: kameezInventorySelect.value ? parseInt(kameezInventorySelect.value) : null,
                 shalwar_inventory_id: shalwarInventorySelect.value ? parseInt(shalwarInventorySelect.value) : null,
                 kameez_company_name: kameezSelectedOption.value ? kameezSelectedOption.dataset.companyName : null,
@@ -240,7 +399,8 @@
             }
 
             try {
-                const response = await fetch(`${API_BASE_URL}/create-bill`, {
+                const apiUrl = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://localhost:8000';
+                const response = await fetch(`${apiUrl}/create-bill`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -270,7 +430,7 @@
             try {
                 // Fallback if API_BASE_URL is not defined
                 const apiUrl = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://localhost:8000';
-                const response = await fetch(`${apiUrl}/get-inventory-simple`);
+                const response = await fetch(`${apiUrl}/get-inventory-simple?category=${currentSalesCategory}`);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -344,8 +504,8 @@
             }
         });
 
-        // Load inventory on page load
-        loadInventory();
+        // Don't auto-load inventory on page load - wait for category selection
+        // loadInventory();
 
         // Function to show messages
         function showMessage(message, type) {

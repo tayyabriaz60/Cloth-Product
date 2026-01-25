@@ -44,6 +44,7 @@ class Inventory(Base):
     __tablename__ = "inventory"
     
     id = Column(Integer, primary_key=True, index=True)
+    product_category = Column(String(50), nullable=False, default='two_piece_suits')  # two_piece_suits, three_piece_suits, gents, ladies, kids, accessories
     company_name = Column(String(255), nullable=False)
     design_code = Column(String(100), nullable=False)
     total_thans = Column(Numeric(10, 2), nullable=False)
@@ -57,6 +58,7 @@ class SalesRecord(Base):
     __tablename__ = "sales_records"
     
     id = Column(Integer, primary_key=True, index=True)
+    product_category = Column(String(50), nullable=False, default='two_piece_suits')  # Category for this sale
     inventory_id = Column(Integer, ForeignKey("inventory.id"), nullable=True)  # Keep for backward compatibility
     kameez_inventory_id = Column(Integer, ForeignKey("inventory.id"), nullable=True)
     shalwar_inventory_id = Column(Integer, ForeignKey("inventory.id"), nullable=True)
@@ -100,8 +102,25 @@ def migrate_database():
                 'kameez_company_name': 'VARCHAR(255)',
                 'kameez_design_code': 'VARCHAR(100)',
                 'shalwar_company_name': 'VARCHAR(255)',
-                'shalwar_design_code': 'VARCHAR(100)'
+                'shalwar_design_code': 'VARCHAR(100)',
+                'product_category': 'VARCHAR(50) DEFAULT \'two_piece_suits\''
             }
+            
+            # Also add product_category to inventory table
+            inv_result = conn.execute(text("""
+                SELECT column_name 
+                FROM information_schema.columns 
+                WHERE table_name='inventory'
+            """))
+            inv_existing_columns = [row[0] for row in inv_result.fetchall()]
+            
+            if 'product_category' not in inv_existing_columns:
+                try:
+                    conn.execute(text("ALTER TABLE inventory ADD COLUMN product_category VARCHAR(50) DEFAULT 'two_piece_suits'"))
+                    print("✓ Added product_category to inventory table")
+                except Exception as e:
+                    if "already exists" not in str(e).lower():
+                        print(f"⚠ Warning adding product_category to inventory: {str(e)}")
             
             added_columns = []
             for col_name, col_type in columns_to_add.items():
@@ -188,9 +207,26 @@ async def index_html():
 
 @app.get("/admin")
 async def admin_page():
+    """Serve admin page - category selection"""
     file_path = get_file_path("admin.html")
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="admin.html not found")
+    return FileResponse(file_path)
+
+@app.get("/admin/{category}")
+async def admin_category_page(category: str):
+    """Serve admin page for specific category - same HTML file, JavaScript handles category"""
+    file_path = get_file_path("admin.html")
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="admin.html not found")
+    return FileResponse(file_path)
+
+@app.get("/sales/{category}")
+async def sales_category_page(category: str):
+    """Serve sales page for specific category - same HTML file, JavaScript handles category"""
+    file_path = get_file_path("index.html")
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="index.html not found")
     return FileResponse(file_path)
 
 @app.get("/config.js")
@@ -202,6 +238,7 @@ async def config_js():
 
 # Pydantic models for request/response
 class StockCreate(BaseModel):
+    product_category: str = 'two_piece_suits'  # Default to two_piece_suits
     company_name: str
     design_code: str
     total_thans: float
@@ -209,6 +246,7 @@ class StockCreate(BaseModel):
     cost_price_per_meter: float
 
 class StockUpdate(BaseModel):
+    product_category: Optional[str] = None
     company_name: Optional[str] = None
     design_code: Optional[str] = None
     total_thans: Optional[float] = None
@@ -217,6 +255,7 @@ class StockUpdate(BaseModel):
 
 class InventoryResponse(BaseModel):
     id: int
+    product_category: str
     company_name: str
     design_code: str
     total_thans: Decimal
@@ -231,6 +270,7 @@ class InventoryResponse(BaseModel):
 
 class InventoryStatus(BaseModel):
     id: int
+    product_category: str
     company_name: str
     design_code: str
     total_thans: Decimal
@@ -243,6 +283,7 @@ class InventoryStatus(BaseModel):
     remaining_stock_value: Decimal
 
 class BillCreate(BaseModel):
+    product_category: str = 'two_piece_suits'  # Category for this sale
     inventory_id: Optional[int] = None  # For backward compatibility
     kameez_inventory_id: Optional[int] = None
     shalwar_inventory_id: Optional[int] = None
@@ -291,6 +332,7 @@ def add_stock(stock: StockCreate):
         
         # Create inventory record
         inventory = Inventory(
+            product_category=stock.product_category,
             company_name=stock.company_name,
             design_code=stock.design_code,
             total_thans=Decimal(str(stock.total_thans)),
@@ -322,6 +364,8 @@ def update_stock(stock_id: int, stock_update: StockUpdate):
             raise HTTPException(status_code=404, detail="Stock item not found")
         
         # Update fields if provided
+        if stock_update.product_category is not None:
+            inventory.product_category = stock_update.product_category
         if stock_update.company_name is not None:
             inventory.company_name = stock_update.company_name
         if stock_update.design_code is not None:
@@ -394,13 +438,17 @@ def delete_stock(stock_id: int):
             db.close()
 
 @app.get("/get-inventory", response_model=List[InventoryStatus])
-def get_inventory():
+def get_inventory(category: Optional[str] = None):
+    """Get inventory, optionally filtered by product category"""
     db = None
     try:
         db = SessionLocal()
         
-        # Get all inventory items
-        inventory_items = db.query(Inventory).all()
+        # Get inventory items, optionally filtered by category
+        query = db.query(Inventory)
+        if category:
+            query = query.filter(Inventory.product_category == category)
+        inventory_items = query.all()
         
         # Calculate sold meters and remaining stock for each item
         result = []
@@ -422,7 +470,12 @@ def get_inventory():
             sold_meters = Decimal('0')
             
             # Old method: count both kameez and shalwar from inventory_id
+            # Only count if new method fields are NULL to avoid double counting
             for sale in sales_old:
+                # Skip if this sale uses new method (has separate inventory IDs)
+                if sale.kameez_inventory_id is not None or sale.shalwar_inventory_id is not None:
+                    continue
+                    
                 kameez_m = Decimal(str(sale.kameez_meters)) if sale.kameez_meters is not None else Decimal('0')
                 shalwar_m = Decimal(str(sale.shalwar_meters)) if sale.shalwar_meters is not None else Decimal('0')
                 sold_meters += kameez_m + shalwar_m
@@ -442,6 +495,7 @@ def get_inventory():
             
             result.append(InventoryStatus(
                 id=item.id,
+                product_category=item.product_category,
                 company_name=item.company_name,
                 design_code=item.design_code,
                 total_thans=item.total_thans,
@@ -463,13 +517,16 @@ def get_inventory():
             db.close()
 
 @app.get("/get-inventory-simple", response_model=List[dict])
-def get_inventory_simple():
-    """Simplified inventory list for dropdown selection"""
+def get_inventory_simple(category: Optional[str] = None):
+    """Simplified inventory list for dropdown selection, optionally filtered by category"""
     db = None
     db_temp = None
     try:
         db = SessionLocal()
-        inventory_items = db.query(Inventory).all()
+        query = db.query(Inventory)
+        if category:
+            query = query.filter(Inventory.product_category == category)
+        inventory_items = query.all()
         
         result = []
         for item in inventory_items:
@@ -490,8 +547,12 @@ def get_inventory_simple():
             
             sold_meters = Decimal('0')
             
-            # Old method
+            # Old method - only count if new method fields are NULL
             for sale in sales_old:
+                # Skip if this sale uses new method (has separate inventory IDs)
+                if sale.kameez_inventory_id is not None or sale.shalwar_inventory_id is not None:
+                    continue
+                    
                 kameez_m = Decimal(str(sale.kameez_meters)) if sale.kameez_meters is not None else Decimal('0')
                 shalwar_m = Decimal(str(sale.shalwar_meters)) if sale.shalwar_meters is not None else Decimal('0')
                 sold_meters += kameez_m + shalwar_m
@@ -639,6 +700,7 @@ def create_bill(bill: BillCreate):
         
         # Create sales record
         sales_record = SalesRecord(
+            product_category=bill.product_category,
             inventory_id=bill.inventory_id,  # For backward compatibility
             kameez_inventory_id=bill.kameez_inventory_id,
             shalwar_inventory_id=bill.shalwar_inventory_id,
@@ -672,14 +734,17 @@ def create_bill(bill: BillCreate):
             db.close()
 
 @app.get("/get-profit-loss")
-def get_profit_loss():
-    """Calculate profit/loss per design"""
+def get_profit_loss(category: Optional[str] = None):
+    """Calculate profit/loss per design, optionally filtered by category"""
     db = None
     try:
         db = SessionLocal()
         
-        # Get all inventory items
-        inventory_items = db.query(Inventory).all()
+        # Get inventory items, optionally filtered by category
+        query = db.query(Inventory)
+        if category:
+            query = query.filter(Inventory.product_category == category)
+        inventory_items = query.all()
         
         result = []
         for item in inventory_items:
@@ -704,7 +769,13 @@ def get_profit_loss():
             total_meters_sold = Decimal('0')
             
             # Process old method sales (both kameez and shalwar count)
+            # Only count sales where kameez_inventory_id and shalwar_inventory_id are NULL
+            # to avoid double counting with new method
             for sale in sales_old:
+                # Skip if this sale uses new method (has separate inventory IDs)
+                if sale.kameez_inventory_id is not None or sale.shalwar_inventory_id is not None:
+                    continue
+                    
                 kameez_m = Decimal(str(sale.kameez_meters)) if sale.kameez_meters is not None else Decimal('0')
                 shalwar_m = Decimal(str(sale.shalwar_meters)) if sale.shalwar_meters is not None else Decimal('0')
                 meters_sold = kameez_m + shalwar_m
