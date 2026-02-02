@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Business Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="config.js"></script>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-blue-600">Business Manager</h1>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="/" class="text-blue-600 font-semibold px-3 py-2 rounded-md">Dashboard</a>
+                    <a href="/sales" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md">Sales</a>
+                    <a href="/purchases" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md">Purchases</a>
+                    <a href="/payments" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md">Payments</a>
+                    <a href="/customers" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md">Customers</a>
+                    <a href="/items" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md">Items</a>
+                    <a href="/reports" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md">Reports</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Welcome Section -->
+        <div class="mb-8">
+            <h2 class="text-3xl font-bold text-gray-800">Dashboard</h2>
+            <p class="text-gray-600 mt-2">Welcome to your Business Management System</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Today's Sales -->
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">Today's Sales</p>
+                        <p id="todaySales" class="text-2xl font-bold text-gray-800 mt-2">Rs. 0</p>
+                    </div>
+                    <div class="bg-blue-100 rounded-full p-3">
+                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                            </path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Customers -->
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-green-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">Total Customers</p>
+                        <p id="totalCustomers" class="text-2xl font-bold text-gray-800 mt-2">0</p>
+                    </div>
+                    <div class="bg-green-100 rounded-full p-3">
+                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                            </path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Items -->
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-purple-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">Total Items</p>
+                        <p id="totalItems" class="text-2xl font-bold text-gray-800 mt-2">0</p>
+                    </div>
+                    <div class="bg-purple-100 rounded-full p-3">
+                        <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pending Balance -->
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-red-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">Receivables</p>
+                        <p id="pendingBalance" class="text-2xl font-bold text-gray-800 mt-2">Rs. 0</p>
+                    </div>
+                    <div class="bg-red-100 rounded-full p-3">
+                        <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+                            </path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="bg-white rounded-lg shadow p-6 mb-8">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Quick Actions</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <a href="/sales"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-lg text-center transition duration-200 flex items-center justify-center">
+                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Create Sales Invoice
+                </a>
+                <a href="/customers"
+                    class="bg-green-600 hover:bg-green-700 text-white font-semibold py-4 px-6 rounded-lg text-center transition duration-200 flex items-center justify-center">
+                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z">
+                        </path>
+                    </svg>
+                    Add Customer
+                </a>
+                <a href="/items"
+                    class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-4 px-6 rounded-lg text-center transition duration-200 flex items-center justify-center">
+                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Add Item
+                </a>
+            </div>
+        </div>
+
+        <!-- Recent Invoices -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">Recent Invoices</h3>
+                <button onclick="loadRecentInvoices()"
+                    class="text-blue-600 hover:text-blue-800 font-semibold">Refresh</button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Invoice #</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Customer</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Amount</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentInvoicesBody" class="bg-white divide-y divide-gray-200">
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const apiUrl = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://localhost:8000';
+
+        // Format currency
+        function formatCurrency(amount) {
+            return 'Rs. ' + parseFloat(amount).toFixed(2);
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+        }
+
+        // Load dashboard stats
+        async function loadDashboardStats() {
+            try {
+                // Load customers
+                const customersRes = await fetch(`${apiUrl}/api/customers?account_type=customer`);
+                const customers = await customersRes.json();
+                document.getElementById('totalCustomers').textContent = customers.length;
+
+                // Calculate receivables
+                const receivables = customers.reduce((sum, c) => sum + parseFloat(c.current_balance), 0);
+                document.getElementById('pendingBalance').textContent = formatCurrency(receivables);
+
+                // Load items
+                const itemsRes = await fetch(`${apiUrl}/api/items`);
+                const items = await itemsRes.json();
+                document.getElementById('totalItems').textContent = items.length;
+
+                // Load today's sales
+                const invoicesRes = await fetch(`${apiUrl}/api/invoices?invoice_type=sale&limit=100`);
+                const invoices = await invoicesRes.json();
+
+                const today = new Date().toDateString();
+                const todaySales = invoices
+                    .filter(inv => new Date(inv.invoice_date).toDateString() === today)
+                    .reduce((sum, inv) => sum + parseFloat(inv.net_amount), 0);
+
+                document.getElementById('todaySales').textContent = formatCurrency(todaySales);
+
+            } catch (error) {
+                console.error('Error loading dashboard stats:', error);
+            }
+        }
+
+        // Load recent invoices
+        async function loadRecentInvoices() {
+            try {
+                const response = await fetch(`${apiUrl}/api/invoices?invoice_type=sale&limit=10`);
+                const invoices = await response.json();
+
+                const tbody = document.getElementById('recentInvoicesBody');
+
+                if (invoices.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">No invoices found</td></tr>';
+                    return;
+                }
+
+                // Get customer names
+                const customersRes = await fetch(`${apiUrl}/api/customers`);
+                const customers = await customersRes.json();
+                const customerMap = {};
+                customers.forEach(c => customerMap[c.id] = c.name);
+
+                tbody.innerHTML = invoices.map(inv => `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">${inv.invoice_number}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${formatDate(inv.invoice_date)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${customerMap[inv.customer_id] || 'Unknown'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${formatCurrency(inv.net_amount)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm ${parseFloat(inv.current_balance) > 0 ? 'text-red-600' : 'text-green-600'} font-semibold">
+                            ${formatCurrency(inv.current_balance)}
+                        </td>
+                    </tr>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading recent invoices:', error);
+                document.getElementById('recentInvoicesBody').innerHTML =
+                    '<tr><td colspan="5" class="px-6 py-4 text-center text-red-500">Error loading invoices</td></tr>';
+            }
+        }
+
+        // Load data on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadDashboardStats();
+            loadRecentInvoices();
+        });
+    </script>
+</body>
+
+</html>

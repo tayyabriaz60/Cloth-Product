@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customers - Business Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="config.js"></script>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-blue-600">Business Manager</h1>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="/" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md">Dashboard</a>
+                    <a href="/sales" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md">Sales</a>
+                    <a href="/purchases" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md">Purchases</a>
+                    <a href="/payments" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md">Payments</a>
+                    <a href="/customers" class="text-blue-600 font-semibold px-3 py-2 rounded-md">Customers</a>
+                    <a href="/items" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md">Items</a>
+                    <a href="/reports" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md">Reports</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <div class="mb-6">
+            <h2 class="text-3xl font-bold text-gray-800">Customer Management</h2>
+            <p class="text-gray-600 mt-2">Manage your customers and suppliers</p>
+        </div>
+
+        <!-- Add Customer Form -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Add New Customer</h3>
+            <form id="customerForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Name *</label>
+                    <input type="text" id="name" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                        placeholder="Customer Name" />
+                </div>
+                <div>
+                    <label for="contact" class="block text-sm font-medium text-gray-700 mb-2">Contact</label>
+                    <input type="text" id="contact"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                        placeholder="Phone Number" />
+                </div>
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input type="email" id="email"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                        placeholder="email@example.com" />
+                </div>
+                <div>
+                    <label for="accountType" class="block text-sm font-medium text-gray-700 mb-2">Account Type *</label>
+                    <select id="accountType"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                        <option value="customer">Customer</option>
+                        <option value="supplier">Supplier</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="openingBalance" class="block text-sm font-medium text-gray-700 mb-2">Opening
+                        Balance</label>
+                    <input type="number" id="openingBalance" step="0.01" value="0"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                        placeholder="0.00" />
+                </div>
+                <div class="md:col-span-2">
+                    <label for="address" class="block text-sm font-medium text-gray-700 mb-2">Address</label>
+                    <textarea id="address" rows="2"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                        placeholder="Full Address"></textarea>
+                </div>
+                <div class="md:col-span-2">
+                    <button type="submit"
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-md transition duration-200">
+                        Add Customer
+                    </button>
+                </div>
+            </form>
+            <div id="messageBox" class="hidden mt-4 p-4 rounded-md"></div>
+        </div>
+
+        <!-- Customers List -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">Customers List</h3>
+                <div class="flex space-x-2">
+                    <select id="filterType" onchange="loadCustomers()"
+                        class="px-4 py-2 border border-gray-300 rounded-md">
+                        <option value="">All</option>
+                        <option value="customer">Customers Only</option>
+                        <option value="supplier">Suppliers Only</option>
+                    </select>
+                    <button onclick="loadCustomers()"
+                        class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-md">
+                        Refresh
+                    </button>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contact</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Current Balance
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customersTableBody" class="bg-white divide-y divide-gray-200">
+                        <tr>
+                            <td colspan="6" class="px-6 py-4 text-center text-gray-500">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const apiUrl = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://localhost:8000';
+
+        // Load customers on page load
+        window.addEventListener('DOMContentLoaded', loadCustomers);
+
+        // Format currency
+        function formatCurrency(amount) {
+            return 'Rs. ' + parseFloat(amount).toFixed(2);
+        }
+
+        // Show message
+        function showMessage(message, type) {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.textContent = message;
+            messageBox.className = `mt-4 p-4 rounded-md ${type === 'success'
+                ? 'bg-green-100 text-green-800 border border-green-400'
+                : 'bg-red-100 text-red-800 border border-red-400'
+                }`;
+            messageBox.classList.remove('hidden');
+
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Load customers
+        async function loadCustomers() {
+            try {
+                const filterType = document.getElementById('filterType').value;
+                const url = filterType
+                    ? `${apiUrl}/api/customers?account_type=${filterType}`
+                    : `${apiUrl}/api/customers`;
+
+                const response = await fetch(url);
+                const customers = await response.json();
+
+                const tbody = document.getElementById('customersTableBody');
+
+                if (customers.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">No customers found</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = customers.map(customer => {
+                    const balance = parseFloat(customer.current_balance);
+                    const balanceClass = balance > 0 ? 'text-red-600' : balance < 0 ? 'text-green-600' : 'text-gray-600';
+
+                    return `
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${customer.id}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${customer.name}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${customer.contact || 'N/A'}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <span class="px-2 py-1 rounded-full text-xs font-semibold ${customer.account_type === 'customer'
+                            ? 'bg-blue-100 text-blue-800'
+                            : 'bg-purple-100 text-purple-800'
+                        }">
+                                    ${customer.account_type}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold ${balanceClass}">
+                                ${formatCurrency(customer.current_balance)}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <button 
+                                    onclick="editCustomer(${customer.id})"
+                                    class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-xs mr-2"
+                                >
+                                    Edit
+                                </button>
+                                <button 
+                                    onclick="deleteCustomer(${customer.id})"
+                                    class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs"
+                                >
+                                    Delete
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error('Error loading customers:', error);
+                document.getElementById('customersTableBody').innerHTML =
+                    '<tr><td colspan="6" class="px-6 py-4 text-center text-red-500">Error loading customers</td></tr>';
+            }
+        }
+
+        // Edit customer
+        let editingCustomerId = null;
+        async function editCustomer(id) {
+            try {
+                const response = await fetch(`${apiUrl}/api/customers/${id}`);
+                const customer = await response.json();
+
+                // Populate form
+                document.getElementById('name').value = customer.name;
+                document.getElementById('contact').value = customer.contact || '';
+                document.getElementById('email').value = customer.email || '';
+                document.getElementById('address').value = customer.address || '';
+                document.getElementById('accountType').value = customer.account_type;
+                document.getElementById('openingBalance').value = customer.opening_balance;
+
+                // Change button text
+                const submitBtn = document.querySelector('#customerForm button[type="submit"]');
+                submitBtn.textContent = 'Update Customer';
+                submitBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                submitBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+
+                // Store editing ID
+                editingCustomerId = id;
+
+                // Scroll to form
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch (error) {
+                showMessage(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Delete customer
+        async function deleteCustomer(id) {
+            if (!confirm('Are you sure you want to delete this customer?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${apiUrl}/api/customers/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showMessage('Customer deleted successfully!', 'success');
+                    loadCustomers();
+                } else {
+                    const error = await response.json();
+                    showMessage(`Error: ${error.detail || 'Failed to delete customer'}`, 'error');
+                }
+            } catch (error) {
+                showMessage(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Submit form
+        document.getElementById('customerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const customerData = {
+                name: document.getElementById('name').value,
+                contact: document.getElementById('contact').value || null,
+                email: document.getElementById('email').value || null,
+                address: document.getElementById('address').value || null,
+                account_type: document.getElementById('accountType').value,
+                opening_balance: parseFloat(document.getElementById('openingBalance').value) || 0
+            };
+
+            try {
+                let response;
+                if (editingCustomerId) {
+                    // Update existing customer
+                    response = await fetch(`${apiUrl}/api/customers/${editingCustomerId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(customerData)
+                    });
+                } else {
+                    // Create new customer
+                    response = await fetch(`${apiUrl}/api/customers`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(customerData)
+                    });
+                }
+
+                if (response.ok) {
+                    showMessage(editingCustomerId ? 'Customer updated successfully!' : 'Customer added successfully!', 'success');
+                    document.getElementById('customerForm').reset();
+
+                    // Reset button
+                    const submitBtn = document.querySelector('#customerForm button[type="submit"]');
+                    submitBtn.textContent = 'Add Customer';
+                    submitBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                    submitBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+
+                    editingCustomerId = null;
+                    loadCustomers();
+                } else {
+                    const error = await response.json();
+                    showMessage(`Error: ${error.detail || 'Failed to save customer'}`, 'error');
+                }
+            } catch (error) {
+                showMessage(`Error: ${error.message}`, 'error');
+            }
+        });
+    </script>
+</body>
+
+</html>

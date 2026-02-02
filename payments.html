@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payments - Business Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="config.js"></script>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-blue-600">Business Manager</h1>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="/" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md">Dashboard</a>
+                    <a href="/sales" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md">Sales</a>
+                    <a href="/purchases" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md">Purchases</a>
+                    <a href="/payments" class="text-blue-600 font-semibold px-3 py-2 rounded-md">Payments</a>
+                    <a href="/customers" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md">Customers</a>
+                    <a href="/items" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md">Items</a>
+                    <a href="/reports" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md">Reports</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <div class="mb-6">
+            <h2 class="text-3xl font-bold text-gray-800">Payment Entry (Daybook)</h2>
+            <p class="text-gray-600 mt-2">Record payments received from customers or made to suppliers</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Payment Entry Form -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Record Payment</h3>
+                    <form id="paymentForm">
+                        <div class="space-y-4">
+                            <div>
+                                <label for="paymentType" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Payment Type *
+                                </label>
+                                <select id="paymentType" required onchange="updateCustomerList()"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                                    <option value="received">Payment Received (from Customer)</option>
+                                    <option value="made">Payment Made (to Supplier)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="customerId" class="block text-sm font-medium text-gray-700 mb-2">
+                                    <span id="customerLabel">Customer</span> *
+                                </label>
+                                <select id="customerId" required onchange="updateBalance()"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Select Customer</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Current Balance
+                                </label>
+                                <div id="currentBalance"
+                                    class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md font-semibold">
+                                    Rs. 0.00
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="amount" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Amount *
+                                </label>
+                                <input type="number" id="amount" step="0.01" min="0.01" required
+                                    onchange="calculateNewBalance()"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                                    placeholder="0.00" />
+                            </div>
+
+                            <div>
+                                <label for="paymentMode" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Payment Mode *
+                                </label>
+                                <select id="paymentMode"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                                    <option value="cash">Cash</option>
+                                    <option value="bank">Bank Transfer</option>
+                                    <option value="online">Online Payment</option>
+                                    <option value="cheque">Cheque</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="notes" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Notes
+                                </label>
+                                <textarea id="notes" rows="2"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Optional notes..."></textarea>
+                            </div>
+
+                            <div class="bg-blue-50 border-2 border-blue-300 rounded-lg p-3">
+                                <div class="text-sm font-medium text-gray-700 mb-1">New Balance:</div>
+                                <div id="newBalance" class="text-xl font-bold text-blue-600">Rs. 0.00</div>
+                            </div>
+
+                            <button type="submit"
+                                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-md transition duration-200">
+                                Record Payment
+                            </button>
+                    </form>
+                    <div id="messageBox" class="hidden mt-4 p-4 rounded-md"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment History -->
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-gray-800">Payment History</h3>
+                    <div class="flex space-x-2">
+                        <select id="filterType" onchange="loadPayments()"
+                            class="px-4 py-2 border border-gray-300 rounded-md">
+                            <option value="">All Payments</option>
+                            <option value="received">Received</option>
+                            <option value="made">Made</option>
+                        </select>
+                        <button onclick="loadPayments()"
+                            class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-md">
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    Customer/Supplier</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mode</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody id="paymentsTableBody" class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td colspan="6" class="px-4 py-4 text-center text-gray-500">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script>
+        const apiUrl = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://localhost:8000';
+
+        let customers = [];
+        let suppliers = [];
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadCustomers();
+            await loadSuppliers();
+            updateCustomerList();
+            loadPayments();
+        });
+
+        async function loadCustomers() {
+            try {
+                const response = await fetch(`${apiUrl}/api/customers?account_type=customer`);
+                customers = await response.json();
+            } catch (error) {
+                console.error('Error loading customers:', error);
+            }
+        }
+
+        async function loadSuppliers() {
+            try {
+                const response = await fetch(`${apiUrl}/api/customers?account_type=supplier`);
+                suppliers = await response.json();
+            } catch (error) {
+                console.error('Error loading suppliers:', error);
+            }
+        }
+
+        function updateCustomerList() {
+            const paymentType = document.getElementById('paymentType').value;
+            const select = document.getElementById('customerId');
+            const label = document.getElementById('customerLabel');
+
+            select.innerHTML = '<option value="">Select...</option>';
+
+            if (paymentType === 'received') {
+                label.textContent = 'Customer';
+                customers.forEach(customer => {
+                    const option = document.createElement('option');
+                    option.value = customer.id;
+                    option.textContent = `${customer.name} (Balance: Rs. ${parseFloat(customer.current_balance).toFixed(2)})`;
+                    option.dataset.balance = customer.current_balance;
+                    select.appendChild(option);
+                });
+            } else {
+                label.textContent = 'Supplier';
+                suppliers.forEach(supplier => {
+                    const option = document.createElement('option');
+                    option.value = supplier.id;
+                    option.textContent = `${supplier.name} (Balance: Rs. ${parseFloat(supplier.current_balance).toFixed(2)})`;
+                    option.dataset.balance = supplier.current_balance;
+                    select.appendChild(option);
+                });
+            }
+
+            updateBalance();
+        }
+
+        function updateBalance() {
+            const select = document.getElementById('customerId');
+            const selectedOption = select.options[select.selectedIndex];
+            const balance = selectedOption.dataset.balance || 0;
+            document.getElementById('currentBalance').textContent = formatCurrency(balance);
+            calculateNewBalance();
+        }
+
+        function calculateNewBalance() {
+            const currentBalance = parseFloat(document.getElementById('currentBalance').textContent.replace('Rs. ', '')) || 0;
+            const amount = parseFloat(document.getElementById('amount').value) || 0;
+            const paymentType = document.getElementById('paymentType').value;
+
+            // For received: balance decreases (customer owes less)
+            // For made: balance decreases (we owe supplier less)
+            const newBalance = currentBalance - amount;
+
+            document.getElementById('newBalance').textContent = formatCurrency(newBalance);
+        }
+
+        function formatCurrency(amount) {
+            return 'Rs. ' + parseFloat(amount).toFixed(2);
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+        }
+
+        function showMessage(message, type) {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.textContent = message;
+            messageBox.className = `mt-4 p-4 rounded-md ${type === 'success'
+                    ? 'bg-green-100 text-green-800 border border-green-400'
+                    : 'bg-red-100 text-red-800 border border-red-400'
+                }`;
+            messageBox.classList.remove('hidden');
+
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 5000);
+        }
+
+        async function loadPayments() {
+            try {
+                const filterType = document.getElementById('filterType').value;
+                const url = filterType
+                    ? `${apiUrl}/api/payments?payment_type=${filterType}`
+                    : `${apiUrl}/api/payments`;
+
+                const response = await fetch(url);
+                const payments = await response.json();
+
+                const tbody = document.getElementById('paymentsTableBody');
+
+                if (payments.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-4 text-center text-gray-500">No payments found</td></tr>';
+                    return;
+                }
+
+                // Get customer names
+                const allCustomers = [...customers, ...suppliers];
+                const customerMap = {};
+                allCustomers.forEach(c => customerMap[c.id] = c.name);
+
+                tbody.innerHTML = payments.map(payment => {
+                    const typeClass = payment.payment_type === 'received'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-red-100 text-red-800';
+
+                    return `
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">${formatDate(payment.payment_date)}</td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm">
+                                <span class="px-2 py-1 rounded-full text-xs font-semibold ${typeClass}">
+                                    ${payment.payment_type}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">${customerMap[payment.customer_id] || 'Unknown'}</td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm font-semibold text-gray-900">${formatCurrency(payment.amount)}</td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">${payment.payment_mode}</td>
+                            <td class="px-4 py-3 text-sm text-gray-600">${payment.notes || '-'}</td>
+                        </tr>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error('Error loading payments:', error);
+                document.getElementById('paymentsTableBody').innerHTML =
+                    '<tr><td colspan="6" class="px-4 py-4 text-center text-red-500">Error loading payments</td></tr>';
+            }
+        }
+
+        document.getElementById('paymentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const customerId = parseInt(document.getElementById('customerId').value);
+            if (!customerId) {
+                showMessage('Please select a customer/supplier', 'error');
+                return;
+            }
+
+            const paymentData = {
+                customer_id: customerId,
+                amount: parseFloat(document.getElementById('amount').value),
+                payment_mode: document.getElementById('paymentMode').value,
+                payment_type: document.getElementById('paymentType').value,
+                notes: document.getElementById('notes').value || null
+            };
+
+            try {
+                const response = await fetch(`${apiUrl}/api/payments`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(paymentData)
+                });
+
+                if (response.ok) {
+                    showMessage('Payment recorded successfully!', 'success');
+                    document.getElementById('paymentForm').reset();
+
+                    // Reload data
+                    await loadCustomers();
+                    await loadSuppliers();
+                    updateCustomerList();
+                    loadPayments();
+                } else {
+                    const error = await response.json();
+                    showMessage(`Error: ${error.detail || 'Failed to record payment'}`, 'error');
+                }
+            } catch (error) {
+                showMessage(`Error: ${error.message}`, 'error');
+            }
+        });
+    </script>
+</body>
+
+</html>
